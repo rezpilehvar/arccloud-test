@@ -1,3 +1,12 @@
 <resources>
     <string name="app_name">MusicChi</string>
+
+    <string name="ClearButton">Clear</string>
+    <string name="StopLoading">Stop loading?</string>
+    <string name="WaitMore">Wait more</string>
+    <string name="Stop">Stop</string>
+
+    <!--accessibility descriptions-->
+    <string name="AccDescrGoBack">Go back</string>
+    <string name="AccDescrMoreOptions">More options</string>
 </resources>
