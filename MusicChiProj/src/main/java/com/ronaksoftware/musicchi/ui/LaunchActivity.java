@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.ActivityManager;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.ActionMode;
@@ -15,7 +16,9 @@ import android.view.Window;
 import androidx.annotation.NonNull;
 
 import com.ronaksoftware.musicchi.R;
+import com.ronaksoftware.musicchi.UserConfigs;
 import com.ronaksoftware.musicchi.ui.fragments.HomeViewController;
+import com.ronaksoftware.musicchi.ui.fragments.LoginViewController;
 import com.ronaksoftware.musicchi.ui.presenter.BaseViewController;
 import com.ronaksoftware.musicchi.ui.presenter.DrawerLayoutContainer;
 import com.ronaksoftware.musicchi.ui.presenter.PresenterLayout;
@@ -70,9 +73,33 @@ public class LaunchActivity extends Activity implements PresenterLayout.Delegate
         presenterLayout.init(mainFragmentsStack);
         presenterLayout.setDelegate(this);
 
-        presenterLayout.addFragmentToStack(new HomeViewController());
+        if (UserConfigs.isAuthenticated) {
+            presenterLayout.addFragmentToStack(new HomeViewController());
+        } else {
+            presenterLayout.addFragmentToStack(new LoginViewController());
+        }
+
         presenterLayout.showLastFragment();
 
+        checkSystemBarColors();
+
+    }
+
+
+    private void checkSystemBarColors() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            int color = Theme.getColor(Theme.key_actionBarDefault, null, true);
+            DisplayUtility.setLightStatusBar(getWindow(), color == Color.WHITE);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                final Window window = getWindow();
+                color = Theme.getColor(Theme.key_windowBackgroundGray, null, true);
+                if (window.getNavigationBarColor() != color) {
+                    window.setNavigationBarColor(color);
+                    final float brightness = DisplayUtility.computePerceivedBrightness(color);
+                    DisplayUtility.setLightNavigationBar(getWindow(), brightness >= 0.721f);
+                }
+            }
+        }
     }
 
     @Override
@@ -124,7 +151,7 @@ public class LaunchActivity extends Activity implements PresenterLayout.Delegate
     public void onBackPressed() {
         if (drawerLayoutContainer.isDrawerOpened()) {
             drawerLayoutContainer.closeDrawer(false);
-        }else {
+        } else {
             presenterLayout.onBackPressed();
         }
     }

@@ -149,7 +149,8 @@ public class BaseViewController {
 
     protected ActionBar createActionBar(Context context) {
         ActionBar actionBar = new ActionBar(context);
-        actionBar.setBackgroundColor(Theme.getColor(Theme.key_actionBarDefault));
+        int backgroundColor = Theme.getColor(Theme.key_actionBarDefault);
+        actionBar.setBackgroundColor(backgroundColor);
         actionBar.setItemsBackgroundColor(Theme.getColor(Theme.key_actionBarDefaultSelector), false);
         actionBar.setItemsBackgroundColor(Theme.getColor(Theme.key_actionBarActionModeDefaultSelector), true);
         actionBar.setItemsColor(Theme.getColor(Theme.key_actionBarDefaultIcon), false);

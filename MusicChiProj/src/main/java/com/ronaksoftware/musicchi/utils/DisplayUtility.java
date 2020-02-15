@@ -13,6 +13,7 @@ import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.Window;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EdgeEffect;
@@ -69,6 +70,43 @@ public class DisplayUtility {
 
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    public static float computePerceivedBrightness(int color) {
+        return (Color.red(color) * 0.2126f + Color.green(color) * 0.7152f + Color.blue(color) * 0.0722f) / 255f;
+    }
+
+    public static void setLightStatusBar(Window window, boolean enable) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            final View decorView = window.getDecorView();
+            int flags = decorView.getSystemUiVisibility();
+            if (enable) {
+                if ((flags & View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR) == 0) {
+                    flags |= View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
+                    decorView.setSystemUiVisibility(flags);
+                    window.setStatusBarColor(0x0f000000);
+                }
+            } else {
+                if ((flags & View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR) != 0) {
+                    flags &= ~View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
+                    decorView.setSystemUiVisibility(flags);
+                    window.setStatusBarColor(0x33000000);
+                }
+            }
+        }
+    }
+
+    public static void setLightNavigationBar(Window window, boolean enable) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            final View decorView = window.getDecorView();
+            int flags = decorView.getSystemUiVisibility();
+            if (enable) {
+                flags |= View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR;
+            } else {
+                flags &= ~View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR;
+            }
+            decorView.setSystemUiVisibility(flags);
         }
     }
 
