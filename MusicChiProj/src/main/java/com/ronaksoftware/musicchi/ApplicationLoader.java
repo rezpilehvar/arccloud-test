@@ -4,6 +4,8 @@ import android.app.Application;
 import android.content.Context;
 import android.os.Handler;
 
+import com.acrcloud.utils.ACRCloudExtrTool;
+
 public class ApplicationLoader extends Application {
     public static volatile Context applicationContext;
     public static volatile Handler applicationHandler;
@@ -21,5 +23,7 @@ public class ApplicationLoader extends Application {
         }
 
         applicationHandler = new Handler(getMainLooper());
+
+        ACRCloudExtrTool.touch();
     }
 }
