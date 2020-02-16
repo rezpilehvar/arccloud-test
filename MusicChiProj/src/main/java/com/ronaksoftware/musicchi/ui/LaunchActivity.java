@@ -67,6 +67,7 @@ public class LaunchActivity extends Activity implements PresenterLayout.Delegate
         setContentView(drawerLayoutContainer);
 
         presenterLayout = new PresenterLayout(this);
+        drawerLayoutContainer.setParentPresenterLayout(presenterLayout);
         drawerLayoutContainer.addView(presenterLayout, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
 
         presenterLayout.setDrawerLayoutContainer(drawerLayoutContainer);
