@@ -8,9 +8,10 @@ import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 
+import com.ronaksoftware.musicchi.ui.presenter.BaseViewController;
 import com.ronaksoftware.musicchi.utils.LayoutHelper;
 
-public class LoginViewController extends HomeViewController {
+public class RegisterViewController extends BaseViewController {
 
     @Override
     public View createView(Context context) {
@@ -18,19 +19,18 @@ public class LoginViewController extends HomeViewController {
 
         LinearLayout linearLayout = new LinearLayout(context);
         linearLayout.setOrientation(LinearLayout.VERTICAL);
-        contentView.addView(linearLayout, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, Gravity.CENTER));
+        contentView.addView(linearLayout,LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT,LayoutHelper.WRAP_CONTENT, Gravity.CENTER));
 
         EditText usernameEditText = new EditText(context);
-        usernameEditText.setHint("Username");
-        linearLayout.addView(usernameEditText, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT));
+        linearLayout.addView(usernameEditText, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT,LayoutHelper.WRAP_CONTENT));
 
         EditText passwordEditText = new EditText(context);
-        passwordEditText.setHint("Password");
-        linearLayout.addView(passwordEditText, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, Gravity.LEFT, 0, 12, 0, 0));
+        linearLayout.addView(passwordEditText,LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT,LayoutHelper.WRAP_CONTENT , Gravity.LEFT , 0,12,0,0));
 
         Button submitButton = new Button(context);
-        submitButton.setText("Login");
+        submitButton.setText("Register");
 
+        fragmentView = contentView;
         return fragmentView;
     }
 }
