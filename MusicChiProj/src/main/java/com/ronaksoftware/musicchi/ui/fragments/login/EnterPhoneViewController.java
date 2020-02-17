@@ -4,10 +4,8 @@ import android.content.Context;
 import android.text.InputType;
 import android.view.Gravity;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
-import android.widget.LinearLayout;
 
 import com.ronaksoftware.musicchi.ApplicationLoader;
 import com.ronaksoftware.musicchi.R;
@@ -22,15 +20,11 @@ import com.ronaksoftware.musicchi.ui.presenter.Theme;
 import com.ronaksoftware.musicchi.utils.DisplayUtility;
 import com.ronaksoftware.musicchi.utils.LayoutHelper;
 
-import io.reactivex.Scheduler;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
-import okhttp3.ResponseBody;
 import retrofit2.HttpException;
-import retrofit2.Response;
-import retrofit2.adapter.rxjava2.Result;
 
 public class EnterPhoneViewController extends BaseViewController {
     private static final int doneButtonID = 0;
@@ -101,9 +95,7 @@ public class EnterPhoneViewController extends BaseViewController {
                 progressDialog.dismiss();
                 visibleDialog = null;
 
-                if (sendCodeRequestResponseEnvelope.getPayload().isRegistered()) {
-                    presentFragment(new EnterCodeViewController(sendCodeRequestResponseEnvelope.getPayload(), phoneNumber));
-                }
+                presentFragment(new EnterCodeViewController(sendCodeRequestResponseEnvelope.getPayload(), phoneNumber));
             }
         }, new Consumer<Throwable>() {
             @Override

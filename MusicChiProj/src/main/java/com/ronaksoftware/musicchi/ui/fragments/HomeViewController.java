@@ -37,8 +37,8 @@ public class HomeViewController extends BaseViewController {
 
     @Override
     public View createView(Context context) {
+        actionBar.setTitle("MusicChi!");
         fragmentView = contentView = new FrameLayout(context);
-
 
         Button startRecordButton = new Button(context);
         startRecordButton.setText("Start record");
@@ -58,8 +58,9 @@ public class HomeViewController extends BaseViewController {
                     @Override
                     public void accept(String s) throws Exception {
                         if (s.equals("RECORD_START")) {
-
+                            Log.i("RecordApp","Record Start");
                         }else {
+                            Log.i("RecordApp","Send Request");
                             sendRequest(s);
                         }
                     }
@@ -91,14 +92,16 @@ public class HomeViewController extends BaseViewController {
 
     private void sendRequest(String encoded) {
 
-        requestDisposables.add(ApplicationLoader.musicChiApi.listRepos(encoded).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Consumer<String>() {
+        requestDisposables.add(ApplicationLoader.musicChiApi.searchByFingerprint(encoded).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Consumer<String>() {
             @Override
             public void accept(String s) throws Exception {
+                Log.i("RecordApp","Music Found");
                 Log.i("Response", "success : " + s);
             }
         }, new Consumer<Throwable>() {
             @Override
             public void accept(Throwable throwable) throws Exception {
+                Log.i("RecordApp","Music Not found");
                 throwable.printStackTrace();
             }
         }));

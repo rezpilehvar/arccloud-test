@@ -7,7 +7,6 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Handler;
 
-import com.acrcloud.utils.ACRCloudExtrTool;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.ronaksoftware.musicchi.network.MusicChiApi;
@@ -18,6 +17,7 @@ import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -44,8 +44,6 @@ public class ApplicationLoader extends Application {
 
         applicationHandler = new Handler(getMainLooper());
 
-        ACRCloudExtrTool.touch();
-
 
         OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
 
@@ -56,13 +54,17 @@ public class ApplicationLoader extends Application {
                 Request.Builder request = chain.request().newBuilder();
 
                 request.addHeader("AccessKey", "8ynNr1zPWYEnRJEigKS3VKeUR7ptIpBQxkaP2mOhKBthGfpOTahq0skqeMHI4lUE");
-                if (UserConfigs.isAuthenticated) {
-//                    request.addHeader("")
+                if (UserConfigs.isAuthenticated()) {
+                    request.addHeader("SessionID",UserConfigs.sessionID);
                 }
 
                 return chain.proceed(request.build());
             }
         });
+
+        HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
+        interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
+        httpClient.addInterceptor(interceptor);
 
         GsonBuilder gsonBuilder = new GsonBuilder();
         retrofit = new Retrofit.Builder()

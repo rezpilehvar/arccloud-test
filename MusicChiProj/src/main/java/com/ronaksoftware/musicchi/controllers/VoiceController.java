@@ -9,7 +9,7 @@ import android.util.Log;
 import android.view.HapticFeedbackConstants;
 import android.view.View;
 
-import com.acrcloud.utils.ACRCloudExtrTool;
+import com.acrcloud.rec.ACRCloudClient;
 import com.ronaksoftware.musicchi.ApplicationLoader;
 import com.ronaksoftware.musicchi.errors.RecordError;
 import com.ronaksoftware.musicchi.utils.DispatchQueue;
@@ -52,7 +52,7 @@ public class VoiceController {
     private long lastFingurePrintTime;
 
     private ByteBuffer sendBuffer;
-    private int recordBufferSize = 1280;
+    private int recordBufferSize = 1024 * 10 * 10;
 
     private static final int AUDIO_NO_FOCUS_NO_DUCK = 0;
 
@@ -100,7 +100,7 @@ public class VoiceController {
                         }
 
                         try {
-                            audioRecorder = new AudioRecord(MediaRecorder.AudioSource.DEFAULT, 16000, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT, recordBufferSize * 10);
+                            audioRecorder = new AudioRecord(MediaRecorder.AudioSource.DEFAULT, 8000, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT, recordBufferSize);
                             recordStartTime = System.currentTimeMillis();
                             lastFingurePrintTime = 0;
 
@@ -146,12 +146,16 @@ public class VoiceController {
                                         }
 
                                         boolean oneSecondPassed = recordStartTime < System.currentTimeMillis() -  1000;
-                                        long oneSecondAgo = System.currentTimeMillis() - (1000);
+                                        long oneSecondAgo = System.currentTimeMillis() - (1000 * 5);
 
                                         if (oneSecondPassed && lastFingurePrintTime < oneSecondAgo) {
                                             lastFingurePrintTime = System.currentTimeMillis();
-                                            byte[] fingerprintBytes = ACRCloudExtrTool.createFingerprint(outputStream.toByteArray(),outputStream.size(),false);
-                                            emitter.onNext(new String(fingerprintBytes));
+                                            byte[] fingerprintBytes = ACRCloudClient.createClientFingerprint(buffer.array(),buffer.array().length,8000,1);
+                                            if (fingerprintBytes != null) {
+                                                emitter.onNext(new String(fingerprintBytes));
+                                            }else {
+                                                Log.i("RecordApp","fingerprint null");
+                                            }
                                         }
 
 //                                        Log.i("Record", "outputStream Size : " + outputStream.size());

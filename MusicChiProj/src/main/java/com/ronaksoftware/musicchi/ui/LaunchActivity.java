@@ -17,6 +17,7 @@ import androidx.annotation.NonNull;
 
 import com.ronaksoftware.musicchi.R;
 import com.ronaksoftware.musicchi.UserConfigs;
+import com.ronaksoftware.musicchi.controllers.EventController;
 import com.ronaksoftware.musicchi.ui.fragments.HomeViewController;
 import com.ronaksoftware.musicchi.ui.fragments.login.EnterPhoneViewController;
 import com.ronaksoftware.musicchi.ui.presenter.BaseViewController;
@@ -27,6 +28,10 @@ import com.ronaksoftware.musicchi.utils.DisplayUtility;
 
 import java.util.ArrayList;
 
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.functions.Consumer;
+
 public class LaunchActivity extends Activity implements PresenterLayout.Delegate {
 
     private DrawerLayoutContainer drawerLayoutContainer;
@@ -34,6 +39,8 @@ public class LaunchActivity extends Activity implements PresenterLayout.Delegate
     private static ArrayList<BaseViewController> mainFragmentsStack = new ArrayList<>();
 
     private ActionMode visibleActionMode;
+
+    private CompositeDisposable disposables = new CompositeDisposable();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,18 +81,34 @@ public class LaunchActivity extends Activity implements PresenterLayout.Delegate
         presenterLayout.init(mainFragmentsStack);
         presenterLayout.setDelegate(this);
 
-        if (UserConfigs.isAuthenticated) {
+        checkAuth();
+
+        checkSystemBarColors();
+
+        disposables.add(EventController.authChanged.observeOn(AndroidSchedulers.mainThread()).subscribeOn(AndroidSchedulers.mainThread()).subscribe(new Consumer<Object>() {
+            @Override
+            public void accept(Object o) throws Exception {
+                presenterLayout.removeAllFragments();
+                checkAuth();
+            }
+        }));
+    }
+
+    private void checkAuth() {
+        if (UserConfigs.isAuthenticated()) {
             presenterLayout.addFragmentToStack(new HomeViewController());
         } else {
             presenterLayout.addFragmentToStack(new EnterPhoneViewController());
         }
 
         presenterLayout.showLastFragment();
-
-        checkSystemBarColors();
-
     }
 
+    @Override
+    protected void onDestroy() {
+        disposables.dispose();
+        super.onDestroy();
+    }
 
     private void checkSystemBarColors() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {

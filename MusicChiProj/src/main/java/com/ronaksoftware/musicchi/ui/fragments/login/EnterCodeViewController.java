@@ -9,6 +9,9 @@ import android.widget.FrameLayout;
 
 import com.ronaksoftware.musicchi.ApplicationLoader;
 import com.ronaksoftware.musicchi.R;
+import com.ronaksoftware.musicchi.UserConfigs;
+import com.ronaksoftware.musicchi.controllers.EventController;
+import com.ronaksoftware.musicchi.network.ErrorResponse;
 import com.ronaksoftware.musicchi.network.ResponseEnvelope;
 import com.ronaksoftware.musicchi.network.request.LoginRequest;
 import com.ronaksoftware.musicchi.network.request.SendCodeRequest;
@@ -17,10 +20,13 @@ import com.ronaksoftware.musicchi.network.response.SendCodeResponse;
 import com.ronaksoftware.musicchi.ui.presenter.ActionBar;
 import com.ronaksoftware.musicchi.ui.presenter.ActionBarMenu;
 import com.ronaksoftware.musicchi.ui.presenter.AlertDialog;
+import com.ronaksoftware.musicchi.ui.presenter.BackDrawable;
 import com.ronaksoftware.musicchi.ui.presenter.BaseViewController;
 import com.ronaksoftware.musicchi.ui.presenter.Theme;
 import com.ronaksoftware.musicchi.utils.DisplayUtility;
 import com.ronaksoftware.musicchi.utils.LayoutHelper;
+import com.ronaksoftware.musicchi.utils.Queues;
+import com.ronaksoftware.musicchi.utils.TypeUtility;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
@@ -61,10 +67,13 @@ public class EnterCodeViewController extends BaseViewController {
     public View createView(Context context) {
 
         actionBar.setTitle("Enter Code");
+        actionBar.setBackButtonDrawable(new BackDrawable(false));
         actionBar.setActionBarMenuOnItemClick(new ActionBar.ActionBarMenuOnItemClick() {
             @Override
             public void onItemClick(int id) {
-                if (id == doneButtonID) {
+                if (id == -1) {
+                    finishFragment(true);
+                } else if (id == doneButtonID) {
                     onNextPress();
                 }
             }
@@ -103,17 +112,27 @@ public class EnterCodeViewController extends BaseViewController {
         progressDialog.setOnCancelListener(dialog -> {
             setVisibleDialog(null);
         });
-        setVisibleDialog(progressDialog);
         showDialog(progressDialog);
 
         disposables.add(ApplicationLoader.musicChiApi.login(LoginRequest.create(code, sendCodeResponse.getPhoneCodeHash(), phoneNumber)).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Consumer<ResponseEnvelope<AuthorizationResponse>>() {
             @Override
             public void accept(ResponseEnvelope<AuthorizationResponse> sendCodeRequestResponseEnvelope) throws Exception {
-                requestInProgress = false;
-                progressDialog.dismiss();
-                visibleDialog = null;
+                Queues.runOnUIThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        requestInProgress = false;
+                        progressDialog.dismiss();
+                        visibleDialog = null;
+                        DisplayUtility.hideKeyboard(codeField);
 
-
+                        UserConfigs.sessionID = sendCodeRequestResponseEnvelope.getPayload().getSerssionID();
+                        UserConfigs.username = sendCodeRequestResponseEnvelope.getPayload().getUsername();
+                        UserConfigs.phoneNumber = sendCodeRequestResponseEnvelope.getPayload().getPhone();
+                        UserConfigs.userID = sendCodeRequestResponseEnvelope.getPayload().getUserID();
+                        UserConfigs.save();
+                        EventController.authChanged.onNext(new Object());
+                    }
+                }, 2000);
             }
         }, new Consumer<Throwable>() {
             @Override
@@ -122,16 +141,29 @@ public class EnterCodeViewController extends BaseViewController {
                     throwable.printStackTrace();
                 }
 
+                requestInProgress = false;
+                progressDialog.dismiss();
+                visibleDialog = null;
+
                 if (throwable instanceof HttpException) {
                     HttpException error = (HttpException) throwable;
 
                     if (error.code() == 400) {
+                        if (error.getMessage() != null && error.response() != null && error.response().errorBody() != null && error.response().errorBody() != null) {
+                            ErrorResponse errorResponse = TypeUtility.parseErrorResponse(error.response());
+
+                            if (errorResponse.getPayload().equals("PHONE_NOT_VALID")) {
+                                presentFragment(new RegisterViewController(sendCodeResponse, phoneNumber, code), true);
+                            } else {
+                                DisplayUtility.shakeView(codeField, 2, 0);
+                            }
+
+                            return;
+                        }
+
                         DisplayUtility.shakeView(codeField, 2, 0);
                     }
                 }
-                requestInProgress = false;
-                progressDialog.dismiss();
-                visibleDialog = null;
             }
         }));
 
