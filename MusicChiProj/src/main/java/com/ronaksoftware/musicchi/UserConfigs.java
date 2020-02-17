@@ -1,7 +1,7 @@
 package com.ronaksoftware.musicchi;
 
 public class UserConfigs {
-    public static boolean isAuthenticated = true;
+    public static boolean isAuthenticated = false;
 
     static {
 

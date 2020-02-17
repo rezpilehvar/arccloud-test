@@ -25,13 +25,7 @@ import io.reactivex.schedulers.Schedulers;
 public class HomeViewController extends BaseViewController {
     private Disposable recordDisposable;
     private FrameLayout contentView;
-    private MusicChiApi musicChiApi;
 
-    @Override
-    public boolean onFragmentCreate() {
-        musicChiApi = ApplicationLoader.retrofit.create(MusicChiApi.class);
-        return super.onFragmentCreate();
-    }
 
     @Override
     public void onFragmentDestroy() {
@@ -97,7 +91,7 @@ public class HomeViewController extends BaseViewController {
 
     private void sendRequest(String encoded) {
 
-        requestDisposables.add(musicChiApi.listRepos(encoded).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Consumer<String>() {
+        requestDisposables.add(ApplicationLoader.musicChiApi.listRepos(encoded).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Consumer<String>() {
             @Override
             public void accept(String s) throws Exception {
                 Log.i("Response", "success : " + s);

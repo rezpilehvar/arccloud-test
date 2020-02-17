@@ -18,7 +18,7 @@ import androidx.annotation.NonNull;
 import com.ronaksoftware.musicchi.R;
 import com.ronaksoftware.musicchi.UserConfigs;
 import com.ronaksoftware.musicchi.ui.fragments.HomeViewController;
-import com.ronaksoftware.musicchi.ui.fragments.LoginViewController;
+import com.ronaksoftware.musicchi.ui.fragments.login.EnterPhoneViewController;
 import com.ronaksoftware.musicchi.ui.presenter.BaseViewController;
 import com.ronaksoftware.musicchi.ui.presenter.DrawerLayoutContainer;
 import com.ronaksoftware.musicchi.ui.presenter.PresenterLayout;
@@ -77,7 +77,7 @@ public class LaunchActivity extends Activity implements PresenterLayout.Delegate
         if (UserConfigs.isAuthenticated) {
             presenterLayout.addFragmentToStack(new HomeViewController());
         } else {
-            presenterLayout.addFragmentToStack(new LoginViewController());
+            presenterLayout.addFragmentToStack(new EnterPhoneViewController());
         }
 
         presenterLayout.showLastFragment();
@@ -197,17 +197,19 @@ public class LaunchActivity extends Activity implements PresenterLayout.Delegate
 
     @Override
     public boolean onKeyUp(int keyCode, KeyEvent event) {
-        if (presenterLayout.fragmentsStack.size() == 1) {
-            if (!drawerLayoutContainer.isDrawerOpened()) {
-                if (getCurrentFocus() != null) {
-                    DisplayUtility.hideKeyboard(getCurrentFocus());
+        if (keyCode == KeyEvent.KEYCODE_MENU) {
+            if (presenterLayout.fragmentsStack.size() == 1) {
+                if (!drawerLayoutContainer.isDrawerOpened()) {
+                    if (getCurrentFocus() != null) {
+                        DisplayUtility.hideKeyboard(getCurrentFocus());
+                    }
+                    drawerLayoutContainer.openDrawer(false);
+                } else {
+                    drawerLayoutContainer.closeDrawer(false);
                 }
-                drawerLayoutContainer.openDrawer(false);
             } else {
-                drawerLayoutContainer.closeDrawer(false);
+                presenterLayout.onKeyUp(keyCode, event);
             }
-        } else {
-            presenterLayout.onKeyUp(keyCode, event);
         }
         return super.onKeyUp(keyCode, event);
     }

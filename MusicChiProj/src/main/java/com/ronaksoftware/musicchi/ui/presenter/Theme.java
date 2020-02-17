@@ -91,12 +91,7 @@ public class Theme {
     public static final String key_actionBarTabUnactiveText = "actionBarTabUnactiveText";
     public static final String key_actionBarTabLine = "actionBarTabLine";
     public static final String key_actionBarTabSelector = "actionBarTabSelector";
-    public static final String key_actionBarDefaultArchived = "actionBarDefaultArchived";
-    public static final String key_actionBarDefaultArchivedSelector = "actionBarDefaultArchivedSelector";
-    public static final String key_actionBarDefaultArchivedIcon = "actionBarDefaultArchivedIcon";
-    public static final String key_actionBarDefaultArchivedTitle = "actionBarDefaultArchivedTitle";
-    public static final String key_actionBarDefaultArchivedSearch = "actionBarDefaultArchivedSearch";
-    public static final String key_actionBarDefaultArchivedSearchPlaceholder = "actionBarDefaultSearchArchivedPlaceholder";
+
 
     public static final String key_windowBackgroundUnchecked = "windowBackgroundUnchecked";
     public static final String key_windowBackgroundChecked = "windowBackgroundChecked";
@@ -250,7 +245,7 @@ public class Theme {
         defaultColors.put(key_dialogEmptyImage, 0xff9fa4a8);
         defaultColors.put(key_dialogEmptyText, 0xff8c9094);
 
-        defaultColors.put(key_actionBarDefault, 0xff527da3);
+        defaultColors.put(key_actionBarDefault, 0xffab47bc);
         defaultColors.put(key_actionBarDefaultIcon, 0xffffffff);
         defaultColors.put(key_actionBarActionModeDefault, 0xffffffff);
         defaultColors.put(key_actionBarActionModeDefaultTop, 0x10000000);

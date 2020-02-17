@@ -1,5 +1,9 @@
 package com.ronaksoftware.musicchi.utils;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.AnimatorSet;
+import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.graphics.Color;
@@ -288,5 +292,25 @@ public class DisplayUtility {
             }
             return false;
         }
+    }
+
+    public static void shakeView(final View view, final float x, final int num) {
+        if (view == null) {
+            return;
+        }
+        if (num == 6) {
+            view.setTranslationX(0);
+            return;
+        }
+        AnimatorSet animatorSet = new AnimatorSet();
+        animatorSet.playTogether(ObjectAnimator.ofFloat(view, "translationX", DisplayUtility.dp(x)));
+        animatorSet.setDuration(50);
+        animatorSet.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                shakeView(view, num == 5 ? 0 : -x, num + 1);
+            }
+        });
+        animatorSet.start();
     }
 }

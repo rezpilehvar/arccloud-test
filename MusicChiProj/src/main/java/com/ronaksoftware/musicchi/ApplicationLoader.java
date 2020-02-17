@@ -8,7 +8,16 @@ import android.net.NetworkInfo;
 import android.os.Handler;
 
 import com.acrcloud.utils.ACRCloudExtrTool;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.ronaksoftware.musicchi.network.MusicChiApi;
 
+import java.io.IOException;
+
+import okhttp3.Interceptor;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -18,6 +27,8 @@ public class ApplicationLoader extends Application {
     public static volatile Handler applicationHandler;
 
     public static volatile Retrofit retrofit;
+    public static volatile Gson gson;
+    public static volatile MusicChiApi musicChiApi;
 
     @Override
     public void onCreate() {
@@ -36,11 +47,33 @@ public class ApplicationLoader extends Application {
         ACRCloudExtrTool.touch();
 
 
+        OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
+
+        httpClient.addInterceptor(new Interceptor() {
+            @Override
+            public Response intercept(Chain chain) throws IOException {
+
+                Request.Builder request = chain.request().newBuilder();
+
+                request.addHeader("AccessKey", "8ynNr1zPWYEnRJEigKS3VKeUR7ptIpBQxkaP2mOhKBthGfpOTahq0skqeMHI4lUE");
+                if (UserConfigs.isAuthenticated) {
+//                    request.addHeader("")
+                }
+
+                return chain.proceed(request.build());
+            }
+        });
+
+        GsonBuilder gsonBuilder = new GsonBuilder();
         retrofit = new Retrofit.Builder()
-                .addConverterFactory(GsonConverterFactory.create())
+                .addConverterFactory(GsonConverterFactory.create(gson = gsonBuilder.create()))
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .baseUrl("https://V2.blipapi.xyz")
+                .client(httpClient.build())
                 .build();
+
+
+        musicChiApi = retrofit.create(MusicChiApi.class);
     }
 
     @SuppressLint("MissingPermission")
