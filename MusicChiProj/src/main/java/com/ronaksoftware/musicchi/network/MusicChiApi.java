@@ -5,8 +5,10 @@ import com.ronaksoftware.musicchi.network.request.RegisterRequest;
 import com.ronaksoftware.musicchi.network.request.SendCodeRequest;
 import com.ronaksoftware.musicchi.network.response.AuthorizationResponse;
 import com.ronaksoftware.musicchi.network.response.SendCodeResponse;
+import com.ronaksoftware.musicchi.network.response.SoundSearchResponse;
 
 import io.reactivex.Observable;
+import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
@@ -26,5 +28,5 @@ public interface MusicChiApi {
 
     @FormUrlEncoded
     @POST("/music/search/fingerprint")
-    Observable<String> searchByFingerprint(@Field("fingerprint") String fingerprint);
+    Call<ResponseEnvelope<SoundSearchResponse>> searchByFingerprint(@Field("fingerprint") String fingerprint);
 }

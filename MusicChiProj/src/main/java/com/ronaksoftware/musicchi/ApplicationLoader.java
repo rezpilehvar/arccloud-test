@@ -12,6 +12,7 @@ import com.google.gson.GsonBuilder;
 import com.ronaksoftware.musicchi.network.MusicChiApi;
 
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
@@ -65,6 +66,9 @@ public class ApplicationLoader extends Application {
         HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
         interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
         httpClient.addInterceptor(interceptor);
+        httpClient.connectTimeout(20, TimeUnit.SECONDS)
+                .writeTimeout(20, TimeUnit.SECONDS)
+                .readTimeout(30, TimeUnit.SECONDS);
 
         GsonBuilder gsonBuilder = new GsonBuilder();
         retrofit = new Retrofit.Builder()

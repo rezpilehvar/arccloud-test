@@ -3,35 +3,67 @@ package com.ronaksoftware.musicchi.ui.fragments;
 import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.os.Build;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.TextView;
+import android.widget.Toast;
 
-import com.ronaksoftware.musicchi.ApplicationLoader;
-import com.ronaksoftware.musicchi.controllers.VoiceController;
-import com.ronaksoftware.musicchi.network.MusicChiApi;
+import com.ronaksoftware.musicchi.controllers.EventController;
+import com.ronaksoftware.musicchi.controllers.SoundRecognizer;
+import com.ronaksoftware.musicchi.controllers.recognizer.RecognizeResult;
 import com.ronaksoftware.musicchi.ui.presenter.BaseViewController;
 import com.ronaksoftware.musicchi.utils.LayoutHelper;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
-import io.reactivex.schedulers.Schedulers;
+
 
 public class HomeViewController extends BaseViewController {
-    private Disposable recordDisposable;
+
     private FrameLayout contentView;
 
+    private TextView resultTextView;
+
+    private CompositeDisposable disposables = new CompositeDisposable();
+
+    @Override
+    public boolean onFragmentCreate() {
+        disposables.add(EventController.recognizeResult.observeOn(AndroidSchedulers.mainThread()).subscribeOn(AndroidSchedulers.mainThread()).subscribe(new Consumer<RecognizeResult>() {
+            @Override
+            public void accept(RecognizeResult result) throws Exception {
+                if (result instanceof RecognizeResult.Success) {
+                    RecognizeResult.Success success = (RecognizeResult.Success) result;
+
+                    if (success.getSoundSearchResponse() != null && success.getSoundSearchResponse().getInfo() != null) {
+                        String artist = "";
+                        if (success.getSoundSearchResponse().getInfo().getArtists() != null && !success.getSoundSearchResponse().getInfo().getArtists().isEmpty()) {
+                            artist = success.getSoundSearchResponse().getInfo().getArtists().get(0);
+                        }
+
+                        resultTextView.setText(artist + " : " + success.getSoundSearchResponse().getInfo().getTitle());
+                    }
+
+                    SoundRecognizer.getInstance().stopRecognize();
+                }else if (result instanceof RecognizeResult.Error) {
+
+                }else if (result instanceof RecognizeResult.ServerError) {
+
+                }
+            }
+        }));
+
+        return super.onFragmentCreate();
+    }
 
     @Override
     public void onFragmentDestroy() {
-        if (recordDisposable != null) {
-            recordDisposable.dispose();
-        }
+        disposables.dispose();
         super.onFragmentDestroy();
     }
 
@@ -54,17 +86,7 @@ public class HomeViewController extends BaseViewController {
                     }
                 }
 
-                recordDisposable = VoiceController.getInstance().startRecording().subscribeOn(AndroidSchedulers.mainThread()).subscribeOn(AndroidSchedulers.mainThread()).subscribe(new Consumer<String>() {
-                    @Override
-                    public void accept(String s) throws Exception {
-                        if (s.equals("RECORD_START")) {
-                            Log.i("RecordApp","Record Start");
-                        }else {
-                            Log.i("RecordApp","Send Request");
-                            sendRequest(s);
-                        }
-                    }
-                });
+                start();
             }
         });
 
@@ -75,35 +97,27 @@ public class HomeViewController extends BaseViewController {
         stopRecordButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (recordDisposable != null) {
-                    recordDisposable.dispose();
-                }
-
-                VoiceController.getInstance().stopRecording();
+                cancel();
             }
         });
 
         contentView.addView(stopRecordButton, LayoutHelper.createFrame(LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT, Gravity.CENTER_VERTICAL | Gravity.RIGHT, 0, 0, 16, 0));
 
+
+        resultTextView = new TextView(context);
+        resultTextView.setTextColor(Color.BLACK);
+        contentView.addView(resultTextView,LayoutHelper.createFrame(LayoutHelper.WRAP_CONTENT,LayoutHelper.WRAP_CONTENT,Gravity.TOP | Gravity.CENTER_HORIZONTAL , 16 ,16,16,0));
+
+
+
         return fragmentView;
     }
 
-    private CompositeDisposable requestDisposables = new CompositeDisposable();
+    public void start() {
+        SoundRecognizer.getInstance().startRecognize();
+    }
 
-    private void sendRequest(String encoded) {
-
-        requestDisposables.add(ApplicationLoader.musicChiApi.searchByFingerprint(encoded).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Consumer<String>() {
-            @Override
-            public void accept(String s) throws Exception {
-                Log.i("RecordApp","Music Found");
-                Log.i("Response", "success : " + s);
-            }
-        }, new Consumer<Throwable>() {
-            @Override
-            public void accept(Throwable throwable) throws Exception {
-                Log.i("RecordApp","Music Not found");
-                throwable.printStackTrace();
-            }
-        }));
+    public void cancel() {
+        SoundRecognizer.getInstance().stopRecognize();
     }
 }
