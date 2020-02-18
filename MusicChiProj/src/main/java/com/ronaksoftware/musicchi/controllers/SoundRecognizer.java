@@ -92,4 +92,9 @@ public class SoundRecognizer implements RecognizerThread.Delegate {
     public void onResult(RecognizeResult result) {
         EventController.recognizeResult.onNext(result);
     }
+
+    @Override
+    public void onStatusChanged(boolean recognizing) {
+        EventController.recognizeStatusChanged.onNext(recognizing);
+    }
 }

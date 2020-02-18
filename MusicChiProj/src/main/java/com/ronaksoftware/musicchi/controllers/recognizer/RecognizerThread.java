@@ -21,6 +21,7 @@ import retrofit2.Response;
 public class RecognizerThread extends Thread {
     public interface Delegate {
         void onResult(RecognizeResult result);
+        void onStatusChanged(boolean recognizing);
     }
 
     public static final int fpTime = 3000;
@@ -154,6 +155,7 @@ public class RecognizerThread extends Thread {
                                 }
                             }
                         });
+                        break;
                     }
                     this.mNextRecginzeLen = (int) ((fpTime / 1000 * rate * channels) * 2.0D);
                 }
@@ -219,6 +221,14 @@ public class RecognizerThread extends Thread {
 
     public void run() {
         super.run();
+        Queues.runOnUIThread(new Runnable() {
+            @Override
+            public void run() {
+                if (delegate != null) {
+                    delegate.onStatusChanged(true);
+                }
+            }
+        });
         this.mStartRecognizeTime = System.currentTimeMillis();
         try {
             this.mAudioDataSource.init();
@@ -237,6 +247,14 @@ public class RecognizerThread extends Thread {
         if (startRecognize())
             resumeRecognize();
         reset();
+        Queues.runOnUIThread(new Runnable() {
+            @Override
+            public void run() {
+                if (delegate != null) {
+                    delegate.onStatusChanged(false);
+                }
+            }
+        });
     }
 
 }

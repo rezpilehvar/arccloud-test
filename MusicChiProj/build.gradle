@@ -7,23 +7,37 @@ android {
         applicationId "com.ronaksoftware.musicchi"
         minSdkVersion 18
         targetSdkVersion 29
-        versionCode 1
-        versionName "1.0"
+        versionCode 113
+        versionName "0.0.2"
+
+        setProperty("archivesBaseName", "MusicChi-$versionName")
     }
     sourceSets {
         main {
             jniLibs.srcDirs = ['libs']
         }
     }
-    buildTypes {
-        release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-        }
-    }
     compileOptions {
         sourceCompatibility = 1.8
         targetCompatibility = 1.8
+    }
+
+    signingConfigs {
+        debug {
+            storeFile file("../certificates/Debug.keystore")
+            storePassword "21506426"
+            keyAlias "musichi"
+            keyPassword "21506426"
+        }
+    }
+
+    buildTypes {
+        release {
+            signingConfig signingConfigs.debug
+            debuggable false
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
     }
 }
 

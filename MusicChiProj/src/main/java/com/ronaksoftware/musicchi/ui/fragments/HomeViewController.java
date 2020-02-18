@@ -32,6 +32,9 @@ public class HomeViewController extends BaseViewController {
 
     private CompositeDisposable disposables = new CompositeDisposable();
 
+    private Button startRecordButton;
+    private Button stopRecordButton;
+
     @Override
     public boolean onFragmentCreate() {
         disposables.add(EventController.recognizeResult.observeOn(AndroidSchedulers.mainThread()).subscribeOn(AndroidSchedulers.mainThread()).subscribe(new Consumer<RecognizeResult>() {
@@ -58,6 +61,21 @@ public class HomeViewController extends BaseViewController {
             }
         }));
 
+        disposables.add(EventController.recognizeStatusChanged.observeOn(AndroidSchedulers.mainThread()).subscribeOn(AndroidSchedulers.mainThread()).subscribe(new Consumer<Boolean>() {
+            @Override
+            public void accept(Boolean aBoolean) throws Exception {
+                if (aBoolean) {
+                    actionBar.setTitle("Recognizing...");
+                    startRecordButton.setEnabled(false);
+                    stopRecordButton.setEnabled(true);
+                }else {
+                    actionBar.setTitle("MusicChi!");
+                    stopRecordButton.setEnabled(false);
+                    startRecordButton.setEnabled(true);
+                }
+            }
+        }));
+
         return super.onFragmentCreate();
     }
 
@@ -72,7 +90,7 @@ public class HomeViewController extends BaseViewController {
         actionBar.setTitle("MusicChi!");
         fragmentView = contentView = new FrameLayout(context);
 
-        Button startRecordButton = new Button(context);
+        startRecordButton = new Button(context);
         startRecordButton.setText("Start record");
         startRecordButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -92,7 +110,7 @@ public class HomeViewController extends BaseViewController {
 
         contentView.addView(startRecordButton, LayoutHelper.createFrame(LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT, Gravity.CENTER_VERTICAL | Gravity.LEFT, 16, 0, 0, 0));
 
-        Button stopRecordButton = new Button(context);
+        stopRecordButton = new Button(context);
         stopRecordButton.setText("Stop record");
         stopRecordButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -100,6 +118,8 @@ public class HomeViewController extends BaseViewController {
                 cancel();
             }
         });
+
+        stopRecordButton.setEnabled(false);
 
         contentView.addView(stopRecordButton, LayoutHelper.createFrame(LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT, Gravity.CENTER_VERTICAL | Gravity.RIGHT, 0, 0, 16, 0));
 
@@ -114,6 +134,7 @@ public class HomeViewController extends BaseViewController {
     }
 
     public void start() {
+        resultTextView.setText("");
         SoundRecognizer.getInstance().startRecognize();
     }
 
