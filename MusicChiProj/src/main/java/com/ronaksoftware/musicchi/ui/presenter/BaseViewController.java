@@ -142,7 +142,9 @@ public class BaseViewController {
             }
             if (parentLayout != null && actionBar == null) {
                 actionBar = createActionBar(parentLayout.getContext());
-                actionBar.parentFragment = this;
+                if (actionBar != null) {
+                    actionBar.parentFragment = this;
+                }
             }
         }
     }

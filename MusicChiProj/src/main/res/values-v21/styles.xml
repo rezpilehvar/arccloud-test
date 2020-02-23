@@ -16,8 +16,8 @@
         <item name="android:windowContentOverlay">@null</item>
         <item name="android:colorBackground">@android:color/white</item>
         <item name="android:windowBackground">@android:color/white</item>
-        <item name="android:colorPrimaryDark">#33000000</item>
-        <item name="android:colorPrimary">#527da3</item>
+        <item name="android:colorPrimaryDark">#FD0C6B</item>
+        <item name="android:colorPrimary">#FD0C6B</item>
         <item name="android:colorControlActivated">#808080</item>
         <item name="android:textColorHighlight">#60808080</item>
         <item name="android:navigationBarColor">#000000</item>

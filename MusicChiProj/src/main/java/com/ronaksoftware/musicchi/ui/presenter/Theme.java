@@ -245,7 +245,7 @@ public class Theme {
         defaultColors.put(key_dialogEmptyImage, 0xff9fa4a8);
         defaultColors.put(key_dialogEmptyText, 0xff8c9094);
 
-        defaultColors.put(key_actionBarDefault, 0xffab47bc);
+        defaultColors.put(key_actionBarDefault, 0xFFFD0C6B);
         defaultColors.put(key_actionBarDefaultIcon, 0xffffffff);
         defaultColors.put(key_actionBarActionModeDefault, 0xffffffff);
         defaultColors.put(key_actionBarActionModeDefaultTop, 0x10000000);

@@ -1,11 +1,16 @@
 package com.ronaksoftware.musicchi.ui.fragments.login;
 
 import android.content.Context;
+import android.graphics.Color;
+import android.os.Build;
 import android.text.InputType;
+import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.ronaksoftware.musicchi.ApplicationLoader;
 import com.ronaksoftware.musicchi.R;
@@ -19,6 +24,7 @@ import com.ronaksoftware.musicchi.ui.presenter.BaseViewController;
 import com.ronaksoftware.musicchi.ui.presenter.Theme;
 import com.ronaksoftware.musicchi.utils.DisplayUtility;
 import com.ronaksoftware.musicchi.utils.LayoutHelper;
+import com.ronaksoftware.musicchi.utils.TypefaceUtility;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
@@ -40,21 +46,42 @@ public class EnterPhoneViewController extends BaseViewController {
     }
 
     @Override
+    protected ActionBar createActionBar(Context context) {
+        return null;
+    }
+
+    @Override
     public View createView(Context context) {
-
-        actionBar.setTitle("Enter Phone Number");
-        actionBar.setActionBarMenuOnItemClick(new ActionBar.ActionBarMenuOnItemClick() {
-            @Override
-            public void onItemClick(int id) {
-                if (id == doneButtonID) {
-                    onNextPress();
-                }
-            }
-        });
-        ActionBarMenu menu = actionBar.createMenu();
-        menu.addItemWithWidth(doneButtonID, R.drawable.ic_done, DisplayUtility.dp(56));
-
         FrameLayout contentView = new FrameLayout(context);
+
+        FrameLayout topView = new FrameLayout(context);
+        contentView.addView(topView,LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT,56,Gravity.TOP | Gravity.LEFT ,0, Build.VERSION.SDK_INT >= 21 ? 24 : 0,0,0));
+        topView.setBackgroundColor(Color.parseColor("#FD0C6B"));
+
+        TextView topTextView = new TextView(context);
+        topView.addView(topTextView,LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT,LayoutHelper.WRAP_CONTENT,Gravity.CENTER , 20,0,20,0));
+        topTextView.setText(R.string.auth_enter_phone_topText);
+        topTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP,14);
+        topTextView.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
+        topTextView.setTextColor(Color.WHITE);
+        topTextView.setTypeface(TypefaceUtility.getTypeface("fonts/IRANSans.ttf"));
+
+        ImageView logoImageView = new ImageView(context);
+        logoImageView.setImageResource(R.drawable.logo);
+        logoImageView.setScaleType(ImageView.ScaleType.CENTER);
+        contentView.addView(logoImageView,LayoutHelper.createFrame(LayoutHelper.WRAP_CONTENT,LayoutHelper.WRAP_CONTENT,Gravity.CENTER_HORIZONTAL , 0,50 + 56 + (Build.VERSION.SDK_INT >= 21 ? 24 : 0) , 0,0));
+
+        FrameLayout centerFrame = new FrameLayout(context);
+        contentView.addView(centerFrame,LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT,50,Gravity.TOP | Gravity.LEFT , 0,156 + 56 + (Build.VERSION.SDK_INT >= 21 ? 24 : 0),0,0));
+        centerFrame.setBackgroundColor(Color.parseColor("#FD0C6B"));
+        TextView centerTextView = new TextView(context);
+        centerTextView.setText(R.string.auth_enter_phone_centerText);
+        centerTextView.setTextColor(Color.WHITE);
+        centerTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP,14);
+        centerTextView.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
+        centerTextView.setTypeface(TypefaceUtility.getTypeface("fonts/IRANSans.ttf"));
+        centerFrame.addView(centerTextView,LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT,LayoutHelper.WRAP_CONTENT,Gravity.CENTER,20,0,20,0));
+
 
         phoneNumberField = new EditText(context);
         phoneNumberField.setHint("Phone number");
