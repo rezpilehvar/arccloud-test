@@ -9,6 +9,8 @@ import android.os.Handler;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.ronaksoftware.musicchi.controllers.PreferenceController;
+import com.ronaksoftware.musicchi.controllers.SearchHistoryController;
 import com.ronaksoftware.musicchi.network.MusicChiApi;
 
 import java.io.IOException;
@@ -80,6 +82,9 @@ public class ApplicationLoader extends Application {
 
 
         musicChiApi = retrofit.create(MusicChiApi.class);
+
+        PreferenceController.getInstance();
+        SearchHistoryController.getInstance();
     }
 
     @SuppressLint("MissingPermission")

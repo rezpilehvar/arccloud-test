@@ -95,6 +95,7 @@ public class AlertDialog extends Dialog implements Drawable.Callback {
     private TextView lineProgressViewPercent;
     private OnClickListener onBackButtonListener;
 
+    private boolean drawBackgroundShadow;
     private Drawable shadowDrawable;
     private Rect backgroundPaddings;
 
@@ -165,13 +166,19 @@ public class AlertDialog extends Dialog implements Drawable.Callback {
     }
 
     public AlertDialog(Context context, int progressStyle) {
-        super(context, R.style.Theme_MusicChi_TransparentDialog);
+        this(context,progressStyle,true);
+    }
 
+    public AlertDialog(Context context, int progressStyle , boolean drawBackgroundShadow) {
+        super(context, R.style.Theme_MusicChi_TransparentDialog);
+        this.drawBackgroundShadow = drawBackgroundShadow;
         backgroundPaddings = new Rect();
-        if (progressStyle != 3) {
-            shadowDrawable = context.getResources().getDrawable(R.drawable.popup_fixed_alert).mutate();
-            shadowDrawable.setColorFilter(new PorterDuffColorFilter(getThemeColor(Theme.key_dialogBackground), PorterDuff.Mode.MULTIPLY));
-            shadowDrawable.getPadding(backgroundPaddings);
+        if (drawBackgroundShadow) {
+            if (progressStyle != 3) {
+                shadowDrawable = context.getResources().getDrawable(R.drawable.popup_fixed_alert).mutate();
+                shadowDrawable.setColorFilter(new PorterDuffColorFilter(getThemeColor(Theme.key_dialogBackground), PorterDuff.Mode.MULTIPLY));
+                shadowDrawable.getPadding(backgroundPaddings);
+            }
         }
 
         progressViewStyle = progressStyle;
@@ -355,11 +362,16 @@ public class AlertDialog extends Dialog implements Drawable.Callback {
             }
         };
         containerView.setOrientation(LinearLayout.VERTICAL);
-        if (progressViewStyle == 3) {
+        if (drawBackgroundShadow) {
+            if (progressViewStyle == 3) {
+                containerView.setBackgroundDrawable(null);
+            } else {
+                containerView.setBackgroundDrawable(shadowDrawable);
+            }
+        }else {
             containerView.setBackgroundDrawable(null);
-        } else {
-            containerView.setBackgroundDrawable(shadowDrawable);
         }
+
         containerView.setFitsSystemWindows(Build.VERSION.SDK_INT >= 21);
         setContentView(containerView);
 
@@ -712,7 +724,7 @@ public class AlertDialog extends Dialog implements Drawable.Callback {
         if (progressViewStyle == 3) {
             params.width = WindowManager.LayoutParams.MATCH_PARENT;
         } else {
-            params.dimAmount = 0.6f;
+            params.dimAmount = 0.9f;
             params.flags |= WindowManager.LayoutParams.FLAG_DIM_BEHIND;
 
             lastScreenWidth = DisplayUtility.displaySize.x;
@@ -994,11 +1006,15 @@ public class AlertDialog extends Dialog implements Drawable.Callback {
         }
 
         public Builder(Context context) {
-            alertDialog = new AlertDialog(context, 0);
+            alertDialog = new AlertDialog(context, 0,true);
         }
 
         public Builder(Context context, int progressViewStyle) {
-            alertDialog = new AlertDialog(context, progressViewStyle);
+            alertDialog = new AlertDialog(context, progressViewStyle,true);
+        }
+
+        public Builder(Context context, int progressViewStyle , boolean drawBackgroundShadow) {
+            alertDialog = new AlertDialog(context, progressViewStyle,drawBackgroundShadow);
         }
 
         public Context getContext() {

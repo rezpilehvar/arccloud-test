@@ -44,7 +44,7 @@ public class SoundRecognizer implements RecognizerThread.Delegate {
                 try {
                     dataSource.init();
                     recordInProgress = true;
-                }catch (Exception e){
+                } catch (Exception e) {
                     e.printStackTrace();
                     recordInProgress = false;
                 }
@@ -54,10 +54,11 @@ public class SoundRecognizer implements RecognizerThread.Delegate {
                 return false;
             }
 
-            this.recognizerThread = new RecognizerThread(dataSource,recorderConfig,this);
+            this.recognizerThread = new RecognizerThread(dataSource, recorderConfig, this);
             this.recognizerThread.start();
+            recognizeInProgress = true;
             recordInProgress = true;
-        }catch (Exception e){
+        } catch (Exception e) {
             recordInProgress = false;
             e.printStackTrace();
             return false;
@@ -66,14 +67,13 @@ public class SoundRecognizer implements RecognizerThread.Delegate {
         return true;
     }
 
-    public void stopRecognize(){
+    public void stopRecognize() {
         try {
             Log.d("SoundRecognizer", "cancel recognize");
             this.recognizeInProgress = false;
             if (this.recognizerThread != null) {
                 this.recognizerThread.reqCancel();
                 this.recognizerThread = null;
-                this.recognizeInProgress = false;
             }
             if (recordInProgress) {
                 this.dataSource.release();
@@ -87,6 +87,12 @@ public class SoundRecognizer implements RecognizerThread.Delegate {
         }
     }
 
+    public long getCurrentTime() {
+        if (recognizerThread != null && recognizeInProgress) {
+            return recognizerThread.getRecognizeTime();
+        }
+        return -1;
+    }
 
     @Override
     public void onResult(RecognizeResult result) {

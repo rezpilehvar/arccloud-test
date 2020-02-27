@@ -162,7 +162,7 @@ public class RecognizerThread extends Thread {
                 continue;
             }
             if (curTotalTime > this.mConfig.sessionTotalTimeoutMS || curBufferLen >= maxRecognizeBuffer) {
-                this.mStartRecognizeTime = System.currentTimeMillis();
+//                this.mStartRecognizeTime = System.currentTimeMillis();
                 Queues.runOnUIThread(new Runnable() {
                     @Override
                     public void run() {
@@ -255,6 +255,10 @@ public class RecognizerThread extends Thread {
                 }
             }
         });
+    }
+
+    public long getRecognizeTime() {
+        return System.currentTimeMillis() - this.mStartRecognizeTime;
     }
 
 }

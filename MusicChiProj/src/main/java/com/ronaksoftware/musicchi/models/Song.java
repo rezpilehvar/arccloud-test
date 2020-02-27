@@ -24,6 +24,19 @@ public class Song {
     String artists;
 
 
+    // Player
+    public int audioPlayerDuration;
+    public float audioProgress;
+    public int audioProgressSec;
+    public float bufferedProgress;
+
+    public void resetPlayingProgress() {
+        audioProgress = 0.0f;
+        audioProgressSec = 0;
+        bufferedProgress = 0.0f;
+        audioPlayerDuration = 0;
+    }
+
     public String getId() {
         return id;
     }

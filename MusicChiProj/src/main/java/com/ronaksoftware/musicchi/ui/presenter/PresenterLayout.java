@@ -559,7 +559,7 @@ public class PresenterLayout extends FrameLayout {
         if (transitionAnimationPreviewMode || startedTracking || checkTransitionAnimation() || fragmentsStack.isEmpty()) {
             return;
         }
-        if (!currentActionBar.isActionModeShowed() && currentActionBar != null && currentActionBar.isSearchFieldVisible) {
+        if ((currentActionBar !=null && !currentActionBar.isActionModeShowed()) && currentActionBar != null && currentActionBar.isSearchFieldVisible) {
             currentActionBar.closeSearchField();
             return;
         }

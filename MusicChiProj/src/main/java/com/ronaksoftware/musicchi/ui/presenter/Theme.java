@@ -303,8 +303,8 @@ public class Theme {
         defaultColors.put(key_windowBackgroundWhiteLinkText, 0xff2678b6);
         defaultColors.put(key_windowBackgroundWhiteLinkSelection, 0x3362a9e3);
         defaultColors.put(key_windowBackgroundWhiteBlueHeader, 0xff3a95d5);
-        defaultColors.put(key_windowBackgroundWhiteInputField, 0xffdbdbdb);
-        defaultColors.put(key_windowBackgroundWhiteInputFieldActivated, 0xff37a9f0);
+        defaultColors.put(key_windowBackgroundWhiteInputField, 0xFFFD0C6B);
+        defaultColors.put(key_windowBackgroundWhiteInputFieldActivated, 0xffd30856);
         defaultColors.put(key_windowBackgroundGray, 0xfff0f0f0);
 
 
@@ -497,6 +497,21 @@ public class Theme {
         return defaultDrawable;
     }
 
+    // rad[0] = topLeft - rad[1] = topRight - rad[2] = bottomRight - rad[3] = bottomLeft
+    public static Drawable createRoundRectDrawable(float[] rad, int defaultColor) {
+        if (rad == null || rad.length < 4) {
+            return null;
+        }
+
+        float[] outerRect = new float[]{
+                rad[0], rad[0], rad[1], rad[1], rad[2], rad[2], rad[3], rad[3]
+        };
+
+        ShapeDrawable defaultDrawable = new ShapeDrawable(new RoundRectShape(outerRect, null, null));
+        defaultDrawable.getPaint().setColor(defaultColor);
+        return defaultDrawable;
+    }
+
     public static Drawable createSimpleSelectorRoundRectDrawable(int rad, int defaultColor, int pressedColor) {
         ShapeDrawable defaultDrawable = new ShapeDrawable(new RoundRectShape(new float[]{rad, rad, rad, rad, rad, rad, rad, rad}, null, null));
         defaultDrawable.getPaint().setColor(defaultColor);
@@ -525,18 +540,45 @@ public class Theme {
         return stateListDrawable;
     }
 
-    public static Drawable getRoundRectSelectorDrawable(int color) {
+    public static Drawable getRoundRectSelectorDrawable(int pressedColor) {
+        return getRoundRectSelectorDrawable(pressedColor, Color.TRANSPARENT, DisplayUtility.dp(3));
+    }
+
+    public static Drawable getRoundRectSelectorDrawable(int pressedColor, int radius) {
+        return getRoundRectSelectorDrawable(pressedColor, Color.TRANSPARENT, radius);
+    }
+
+    public static Drawable getRoundRectSelectorDrawable(int pressedColor, int normalColor, int radius) {
         if (Build.VERSION.SDK_INT >= 21) {
-            Drawable maskDrawable = createRoundRectDrawable(DisplayUtility.dp(3), 0xffffffff);
-            ColorStateList colorStateList = new ColorStateList(
-                    new int[][]{StateSet.WILD_CARD},
-                    new int[]{(color & 0x00ffffff) | 0x19000000}
-            );
-            return new RippleDrawable(colorStateList, null, maskDrawable);
+            Drawable maskDrawable = createRoundRectDrawable(radius, Color.WHITE);
+            if (normalColor == Color.TRANSPARENT) {
+                return new RippleDrawable(ColorStateList.valueOf(pressedColor), null, maskDrawable);
+            } else {
+                Drawable contentDrawable = createRoundRectDrawable(radius, normalColor);
+                return new RippleDrawable(ColorStateList.valueOf(pressedColor), contentDrawable, maskDrawable);
+            }
         } else {
             StateListDrawable stateListDrawable = new StateListDrawable();
-            stateListDrawable.addState(new int[]{android.R.attr.state_pressed}, createRoundRectDrawable(DisplayUtility.dp(3), (color & 0x00ffffff) | 0x19000000));
-            stateListDrawable.addState(new int[]{android.R.attr.state_selected}, createRoundRectDrawable(DisplayUtility.dp(3), (color & 0x00ffffff) | 0x19000000));
+            stateListDrawable.addState(new int[]{android.R.attr.state_pressed}, createRoundRectDrawable(radius, (pressedColor & 0x00ffffff) | 0x19000000));
+            stateListDrawable.addState(new int[]{android.R.attr.state_selected}, createRoundRectDrawable(radius, (pressedColor & 0x00ffffff) | 0x19000000));
+            stateListDrawable.addState(StateSet.WILD_CARD, new ColorDrawable(0x00000000));
+            return stateListDrawable;
+        }
+    }
+
+    public static Drawable getRoundRectSelectorDrawable(int pressedColor, int normalColor, float[] radius) {
+        if (Build.VERSION.SDK_INT >= 21) {
+            Drawable maskDrawable = createRoundRectDrawable(radius, Color.WHITE);
+            if (normalColor == Color.TRANSPARENT) {
+                return new RippleDrawable(ColorStateList.valueOf(pressedColor), null, maskDrawable);
+            } else {
+                Drawable contentDrawable = createRoundRectDrawable(radius, normalColor);
+                return new RippleDrawable(ColorStateList.valueOf(pressedColor), contentDrawable, maskDrawable);
+            }
+        } else {
+            StateListDrawable stateListDrawable = new StateListDrawable();
+            stateListDrawable.addState(new int[]{android.R.attr.state_pressed}, createRoundRectDrawable(radius, (pressedColor & 0x00ffffff) | 0x19000000));
+            stateListDrawable.addState(new int[]{android.R.attr.state_selected}, createRoundRectDrawable(radius, (pressedColor & 0x00ffffff) | 0x19000000));
             stateListDrawable.addState(StateSet.WILD_CARD, new ColorDrawable(0x00000000));
             return stateListDrawable;
         }

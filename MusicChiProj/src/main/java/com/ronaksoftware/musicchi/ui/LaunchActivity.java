@@ -19,6 +19,7 @@ import com.ronaksoftware.musicchi.R;
 import com.ronaksoftware.musicchi.UserConfigs;
 import com.ronaksoftware.musicchi.controllers.EventController;
 import com.ronaksoftware.musicchi.ui.fragments.HomeViewController;
+import com.ronaksoftware.musicchi.ui.fragments.RecognizeResultViewController;
 import com.ronaksoftware.musicchi.ui.fragments.login.EnterPhoneViewController;
 import com.ronaksoftware.musicchi.ui.presenter.BaseViewController;
 import com.ronaksoftware.musicchi.ui.presenter.DrawerLayoutContainer;
@@ -96,6 +97,7 @@ public class LaunchActivity extends Activity implements PresenterLayout.Delegate
 
     private void checkAuth() {
         if (UserConfigs.isAuthenticated()) {
+//            presenterLayout.addFragmentToStack(new HomeViewController());
             presenterLayout.addFragmentToStack(new HomeViewController());
         } else {
             presenterLayout.addFragmentToStack(new EnterPhoneViewController());
