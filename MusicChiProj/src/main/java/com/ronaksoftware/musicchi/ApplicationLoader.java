@@ -6,12 +6,20 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Handler;
+import android.util.Log;
+import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.ronaksoftware.musicchi.controllers.EventController;
+import com.ronaksoftware.musicchi.controllers.MediaController;
 import com.ronaksoftware.musicchi.controllers.PreferenceController;
 import com.ronaksoftware.musicchi.controllers.SearchHistoryController;
+import com.ronaksoftware.musicchi.controllers.SoundRecognizer;
+import com.ronaksoftware.musicchi.network.ErrorResponse;
 import com.ronaksoftware.musicchi.network.MusicChiApi;
+import com.ronaksoftware.musicchi.utils.Queues;
+import com.ronaksoftware.musicchi.utils.TypeUtility;
 
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
@@ -58,10 +66,32 @@ public class ApplicationLoader extends Application {
 
                 request.addHeader("AccessKey", "8ynNr1zPWYEnRJEigKS3VKeUR7ptIpBQxkaP2mOhKBthGfpOTahq0skqeMHI4lUE");
                 if (UserConfigs.isAuthenticated()) {
-                    request.addHeader("SessionID",UserConfigs.sessionID);
+                    request.addHeader("SessionID", UserConfigs.sessionID);
                 }
 
-                return chain.proceed(request.build());
+                Response response = chain.proceed(request.build());
+
+                switch (response.code()) {
+                    case 403:
+                        if (response.body() != null) {
+                            ErrorResponse errorResponse = TypeUtility.parseErrorResponse(response.body().charStream());
+
+                            if (errorResponse != null) {
+                                if (errorResponse.getPayload().equals("SESSION_INVALID")) {
+                                    Queues.runOnUIThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            logout(true);
+                                            Toast.makeText(applicationContext, "دوباره وارد شوید", Toast.LENGTH_LONG).show();
+                                        }
+                                    });
+                                }
+                            }
+                        }
+                        throw new IOException("Unauthorized !!");
+                }
+
+                return response;
             }
         });
 
@@ -85,6 +115,21 @@ public class ApplicationLoader extends Application {
 
         PreferenceController.getInstance();
         SearchHistoryController.getInstance();
+    }
+
+    public static void logout(boolean notifyViews) {
+        UserConfigs.phoneNumber = null;
+        UserConfigs.sessionID = null;
+        UserConfigs.userID = null;
+        UserConfigs.username = null;
+        UserConfigs.save();
+        SearchHistoryController.getInstance().data.clear();
+        SearchHistoryController.getInstance().save();
+        if (notifyViews) {
+            EventController.authChanged.onNext(new Object());
+        }
+        SoundRecognizer.getInstance().stopRecognize();
+        MediaController.getInstance().cleanupPlayer(false);
     }
 
     @SuppressLint("MissingPermission")

@@ -206,7 +206,7 @@ public class RecognizerThread extends Thread {
                 return new RecognizeResult.Success(response.body().getPayload());
             } else {
                 if (response.errorBody() != null) {
-                    ErrorResponse errorResponse = TypeUtility.parseErrorResponse(response);
+                    ErrorResponse errorResponse = TypeUtility.parseErrorResponse(response.errorBody().charStream());
 
                     return new RecognizeResult.ServerError(errorResponse);
                 }

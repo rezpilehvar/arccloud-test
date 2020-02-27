@@ -115,16 +115,7 @@ public class SettingsViewController extends BaseViewController {
                                             @Override
                                             public void accept(ResponseEnvelope<BooleanResponse> booleanResponseResponseEnvelope) throws Exception {
                                                 hideLoading();
-                                                UserConfigs.phoneNumber = null;
-                                                UserConfigs.sessionID = null;
-                                                UserConfigs.userID = null;
-                                                UserConfigs.username = null;
-                                                UserConfigs.save();
-                                                SearchHistoryController.getInstance().data.clear();
-                                                SearchHistoryController.getInstance().save();
-                                                EventController.authChanged.onNext(new Object());
-                                                SoundRecognizer.getInstance().stopRecognize();
-                                                MediaController.getInstance().cleanupPlayer(false);
+                                                ApplicationLoader.logout(true);
                                             }
                                         }, new Consumer<Throwable>() {
                                             @Override

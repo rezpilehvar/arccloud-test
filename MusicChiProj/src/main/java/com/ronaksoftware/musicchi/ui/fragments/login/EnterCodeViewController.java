@@ -40,6 +40,8 @@ import com.ronaksoftware.musicchi.utils.Queues;
 import com.ronaksoftware.musicchi.utils.TypeUtility;
 import com.ronaksoftware.musicchi.utils.TypefaceUtility;
 
+import java.util.Objects;
+
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.functions.Consumer;
@@ -278,7 +280,7 @@ public class EnterCodeViewController extends BaseViewController {
 
                     if (error.code() == 400) {
                         if (error.getMessage() != null && error.response() != null && error.response().errorBody() != null && error.response().errorBody() != null) {
-                            ErrorResponse errorResponse = TypeUtility.parseErrorResponse(error.response());
+                            ErrorResponse errorResponse = TypeUtility.parseErrorResponse(Objects.requireNonNull(error.response().errorBody()).charStream());
 
                             if (errorResponse.getPayload().equals("PHONE_NOT_VALID")) {
                                 disposables.add(ApplicationLoader.musicChiApi.register(RegisterRequest.create(finalCode, sendCodeResponse.getPhoneCodeHash(), phoneNumber, "")).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Consumer<ResponseEnvelope<AuthorizationResponse>>() {
