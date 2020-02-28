@@ -101,6 +101,10 @@ public class RecognizeResultViewController extends BaseViewController implements
                 String id = (String) objects[0];
                 float progress = (float) objects[1];
 
+                if (progress >= 1.0f) {
+                    MediaController.getInstance().cleanupPlayer(true);
+                    return;
+                }
                 if (songsListView != null) {
                     int count = songsListView.getChildCount();
                     for (int a = 0; a < count; a++) {

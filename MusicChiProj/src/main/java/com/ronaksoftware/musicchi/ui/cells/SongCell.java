@@ -6,7 +6,9 @@ import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.util.TypedValue;
 import android.view.Gravity;
+import android.view.View;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -75,7 +77,23 @@ public class SongCell extends FrameLayout {
         contentTextView = new TextView(context);
         contentTextView.setTextColor(Color.WHITE);
         contentTextView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 14);
-        addView(contentTextView, LayoutHelper.createFrame(LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT, Gravity.CENTER_VERTICAL | Gravity.LEFT, 56, 0, 0, 0));
+        addView(contentTextView, LayoutHelper.createFrame(LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT, Gravity.CENTER_VERTICAL | Gravity.LEFT, 56, 0, UserConfigs.showBilipLink ? 90 : 56, 0));
+
+
+        if (UserConfigs.showBilipLink) {
+            ImageView bilipLogoImageView = new ImageView(context);
+            bilipLogoImageView.setImageResource(R.drawable.bilip_logo);
+            bilipLogoImageView.setScaleType(ImageView.ScaleType.CENTER);
+            bilipLogoImageView.setBackground(Theme.createSelectorDrawable(Color.WHITE));
+            bilipLogoImageView.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    // handle intent todo
+                }
+            });
+            addView(bilipLogoImageView,LayoutHelper.createFrame(28,28,Gravity.CENTER_VERTICAL | Gravity.RIGHT , 0,0,8,0));
+        }
+
     }
 
     public void update(Song song) {

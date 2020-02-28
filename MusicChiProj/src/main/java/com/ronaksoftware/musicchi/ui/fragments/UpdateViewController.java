@@ -12,10 +12,12 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.ronaksoftware.musicchi.UserConfigs;
 import com.ronaksoftware.musicchi.ui.presenter.ActionBar;
 import com.ronaksoftware.musicchi.ui.presenter.BackDrawable;
 import com.ronaksoftware.musicchi.ui.presenter.BaseViewController;
 import com.ronaksoftware.musicchi.ui.presenter.Theme;
+import com.ronaksoftware.musicchi.utils.Browser;
 import com.ronaksoftware.musicchi.utils.DisplayUtility;
 import com.ronaksoftware.musicchi.utils.LayoutHelper;
 import com.ronaksoftware.musicchi.utils.TypefaceUtility;
@@ -89,11 +91,11 @@ public class UpdateViewController extends BaseViewController {
         updateButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                Browser.openUrl(getParentActivity(), UserConfigs.storeLink);
             }
         });
         updateButton.setBackground(Theme.getRoundRectSelectorDrawable(Color.WHITE, Color.parseColor("#FD0C6B"), DisplayUtility.dp(4)));
-        centerLinear.addView(updateButton, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, 50,0,18,0,0));
+        centerLinear.addView(updateButton, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, 50, 0, 18, 0, 0));
 
         if (!force) {
             TextView ignoreButton = new TextView(context);
@@ -105,11 +107,11 @@ public class UpdateViewController extends BaseViewController {
             ignoreButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-
+                    finishFragment(true);
                 }
             });
             ignoreButton.setBackground(Theme.getRoundRectSelectorDrawable(Color.WHITE, Color.parseColor("#11151E"), DisplayUtility.dp(4)));
-            centerLinear.addView(ignoreButton, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, 50,0,8,0,0));
+            centerLinear.addView(ignoreButton, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, 50, 0, 8, 0, 0));
         }
 
 

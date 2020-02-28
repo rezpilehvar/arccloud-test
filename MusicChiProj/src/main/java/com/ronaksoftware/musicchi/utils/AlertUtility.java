@@ -6,6 +6,7 @@ import android.graphics.drawable.Drawable;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
@@ -71,6 +72,83 @@ public class AlertUtility {
 
         viewController.showDialog(alertDialog);
         return alertDialog;
+    }
+
+    public static Dialog createFeedBackAlert(BaseViewController viewController , FeedBackAlertDelegate delegate) {
+        FrameLayout contentView = new FrameLayout(viewController.getParentActivity());
+
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(viewController.getParentActivity(),0,false);
+        alertDialogBuilder.setView(contentView);
+        AlertDialog alertDialog = alertDialogBuilder.create();
+
+        Drawable backgroundDrawable = Theme.createRoundRectDrawable(DisplayUtility.dp(20), Color.WHITE);
+        contentView.setBackground(backgroundDrawable);
+
+        LinearLayout buttonsContainer = new LinearLayout(viewController.getParentActivity());
+        buttonsContainer.setOrientation(LinearLayout.HORIZONTAL);
+        contentView.addView(buttonsContainer,LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT,48, Gravity.BOTTOM , 0,8,0,0));
+
+        TextView titleTextView = new TextView(viewController.getParentActivity());
+        titleTextView.setTextColor(Color.BLACK);
+        titleTextView.setTextSize(TypedValue.COMPLEX_UNIT_DIP , 14);
+        titleTextView.setTypeface(TypefaceUtility.getTypeface("fonts/IRANSans-Medium.ttf"));
+        titleTextView.setText("لطفا نظرات خود را درباره موزیکجی ارسال کنید.");
+        titleTextView.setGravity(Gravity.CENTER);
+        contentView.addView(titleTextView,LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT,48));
+
+        ScrollView scrollView = new ScrollView(viewController.getParentActivity());
+        contentView.addView(scrollView,LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT,LayoutHelper.WRAP_CONTENT,Gravity.TOP | Gravity.LEFT,0,56,0,48));
+
+        LinearLayout linearLayout = new LinearLayout(viewController.getParentActivity());
+        linearLayout.setOrientation(LinearLayout.VERTICAL);
+        scrollView.addView(linearLayout);
+        linearLayout.setPadding(DisplayUtility.dp(12),DisplayUtility.dp(12),DisplayUtility.dp(12),DisplayUtility.dp(12));
+
+        TextView termsTextView = new TextView(viewController.getParentActivity());
+        termsTextView.setText("نظرات شما برای ما از اهمیت زیادی برخوردار است. ما با کمک نظرات شما تغییرات و بروزرسانی های موزیکچی را برنامه ریزی میکنیم و شما با ارسال نظراتتان آن را به اپلیکیشن کاربردی و دوست داشتنی تبدیل میکند.");
+        termsTextView.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteGrayText));
+        termsTextView.setTypeface(TypefaceUtility.getTypeface("fonts/IRANSans.ttf"));
+        termsTextView.setTextSize(TypedValue.COMPLEX_UNIT_DIP,14);
+        linearLayout.addView(termsTextView,LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT,LayoutHelper.WRAP_CONTENT));
+
+        final EditText feedbackLabel = new EditText(viewController.getParentActivity());
+        feedbackLabel.setHint("لطفا نظراتتان را اینجا بنویسید");
+        feedbackLabel.setTextColor(Color.BLACK);
+        feedbackLabel.setHintTextColor(Color.BLACK);
+        feedbackLabel.setGravity(Gravity.TOP | Gravity.RIGHT);
+        feedbackLabel.setBackground(Theme.createRoundRectDrawable(DisplayUtility.dp(8),Color.parseColor("#E5E9F5")));
+        feedbackLabel.setTypeface(TypefaceUtility.getTypeface("fonts/IRANSans-Light.ttf"));
+        feedbackLabel.setTextSize(TypedValue.COMPLEX_UNIT_SP,12);
+        feedbackLabel.setPadding(DisplayUtility.dp(8),DisplayUtility.dp(4),DisplayUtility.dp(8),DisplayUtility.dp(4));
+        feedbackLabel.setMinHeight(DisplayUtility.dp(70));
+        linearLayout.addView(feedbackLabel,LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT,LayoutHelper.WRAP_CONTENT,0,12,0,12));
+
+        TextView doneButton = new TextView(viewController.getParentActivity());
+        doneButton.setText("ارسال");
+        doneButton.setGravity(Gravity.CENTER);
+        doneButton.setBackground(Theme.getRoundRectSelectorDrawable(Color.WHITE ,Color.parseColor("#FD0C6B"), new float[]{0,0,DisplayUtility.dp(20),DisplayUtility.dp(20)}));
+        doneButton.setTypeface(TypefaceUtility.getTypeface("fonts/IRANSans-Medium.ttf"));
+        doneButton.setTextSize(TypedValue.COMPLEX_UNIT_DIP,16);
+        doneButton.setTextColor(Color.WHITE);
+        doneButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (feedbackLabel.getText().length() == 0) {
+                    DisplayUtility.shakeView(feedbackLabel,2,0);
+                    return;
+                }
+                delegate.onSendPressed(feedbackLabel.getText().toString());
+                alertDialog.dismiss();
+            }
+        });
+        buttonsContainer.addView(doneButton,LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT,LayoutHelper.MATCH_PARENT));
+
+        viewController.showDialog(alertDialog);
+        return alertDialog;
+    }
+
+    public interface FeedBackAlertDelegate {
+        void onSendPressed(String text);
     }
 
     public static Dialog createLogoutAlert(BaseViewController viewController , Runnable doneCallback) {

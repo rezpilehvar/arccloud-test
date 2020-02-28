@@ -1,7 +1,6 @@
 package com.ronaksoftware.musicchi.ui.fragments;
 
 import android.content.Context;
-import android.content.DialogInterface;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
@@ -16,11 +15,6 @@ import android.widget.Toast;
 
 import com.ronaksoftware.musicchi.ApplicationLoader;
 import com.ronaksoftware.musicchi.R;
-import com.ronaksoftware.musicchi.UserConfigs;
-import com.ronaksoftware.musicchi.controllers.EventController;
-import com.ronaksoftware.musicchi.controllers.MediaController;
-import com.ronaksoftware.musicchi.controllers.SearchHistoryController;
-import com.ronaksoftware.musicchi.controllers.SoundRecognizer;
 import com.ronaksoftware.musicchi.network.ResponseEnvelope;
 import com.ronaksoftware.musicchi.network.request.LogoutRequest;
 import com.ronaksoftware.musicchi.network.response.BooleanResponse;
@@ -102,7 +96,14 @@ public class SettingsViewController extends BaseViewController {
                 public void onClick(View view) {
                     int position = (int) view.getTag();
 
-                    if (position == 1) {
+                    if (position == 0) {
+                        AlertUtility.createFeedBackAlert(SettingsViewController.this, new AlertUtility.FeedBackAlertDelegate() {
+                            @Override
+                            public void onSendPressed(String text) {
+
+                            }
+                        });
+                    }else if (position == 1) {
 
                         AlertUtility.createLogoutAlert(SettingsViewController.this, new Runnable() {
                             @Override

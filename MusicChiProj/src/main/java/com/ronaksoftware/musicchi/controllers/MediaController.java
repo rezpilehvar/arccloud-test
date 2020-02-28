@@ -145,7 +145,7 @@ public class MediaController implements AudioManager.OnAudioFocusChangeListener 
         isPaused = false;
         lastProgress = 0;
         playingSong = song;
-        startProgressTimer(playingSong);
+        startProgressTimer();
         EventController.songPlayingDidStart.onNext(new Object[]{song});
 
         try {
@@ -172,7 +172,7 @@ public class MediaController implements AudioManager.OnAudioFocusChangeListener 
         }
 
         try {
-            startProgressTimer(getPlayingSongObject());
+            startProgressTimer();
             if (audioPlayer != null) {
                 audioPlayer.play();
             }
@@ -250,7 +250,7 @@ public class MediaController implements AudioManager.OnAudioFocusChangeListener 
         }
     }
 
-    private void startProgressTimer(final Song currentPlayingSongObject) {
+    private void startProgressTimer() {
         synchronized (progressTimerSync) {
             if (progressTimer != null) {
                 try {
@@ -266,17 +266,18 @@ public class MediaController implements AudioManager.OnAudioFocusChangeListener 
                 public void run() {
                     synchronized (sync) {
                         Queues.runOnUIThread(() -> {
-                            if (currentPlayingSongObject != null && audioPlayer != null && !isPaused) {
+                            if (audioPlayer != null && !isPaused) {
                                 try {
                                     long duration;
                                     long progress;
                                     float value;
                                     float bufferedValue;
-                                    duration = audioPlayer.getDuration();
+//                                    duration = audioPlayer.getDuration();
+                                    duration = 30000;
                                     progress = audioPlayer.getCurrentPosition();
-                                    value = duration != C.TIME_UNSET && duration >= 0 ? (progress / (float) duration) : 0.0f;
+                                    value = progress / (float) duration;
                                     bufferedValue = audioPlayer.getBufferedPosition() / (float) duration;
-                                    if (duration == C.TIME_UNSET || progress < 0 || seekToProgressPending != 0) {
+                                    if (progress < 0 || seekToProgressPending != 0) {
                                         return;
                                     }
                                     lastProgress = progress;

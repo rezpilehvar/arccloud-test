@@ -115,6 +115,11 @@ public class LaunchActivity extends Activity implements PresenterLayout.Delegate
                         showUpdateAlert(configResponseResponseEnvelope.getPayload().isUpdateForce());
                     }
                 }
+            }, new Consumer<Throwable>() {
+                @Override
+                public void accept(Throwable throwable) throws Exception {
+                    throwable.printStackTrace();
+                }
             }));
         }
     }

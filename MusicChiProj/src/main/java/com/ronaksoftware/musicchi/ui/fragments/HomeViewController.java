@@ -23,6 +23,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.ronaksoftware.musicchi.ApplicationLoader;
 import com.ronaksoftware.musicchi.R;
 import com.ronaksoftware.musicchi.controllers.EventController;
 import com.ronaksoftware.musicchi.controllers.SearchHistoryController;
@@ -258,6 +259,10 @@ public class HomeViewController extends BaseViewController implements Timer.Dele
                         }
                     }
 
+                    if (!ApplicationLoader.isNetworkOnline()) {
+                        Toast.makeText(getParentActivity(),"لطفا از اتصال به اینترنت مطمعن شوید.",Toast.LENGTH_LONG).show();
+                        return;
+                    }
 
                     SoundRecognizer.getInstance().startRecognize();
                     recognizeInProgress = true;
