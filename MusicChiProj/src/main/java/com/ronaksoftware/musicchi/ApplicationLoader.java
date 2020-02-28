@@ -3,6 +3,8 @@ package com.ronaksoftware.musicchi;
 import android.annotation.SuppressLint;
 import android.app.Application;
 import android.content.Context;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Handler;
@@ -69,26 +71,38 @@ public class ApplicationLoader extends Application {
                     request.addHeader("SessionID", UserConfigs.sessionID);
                 }
 
+                String appVersion = null;
+                try {
+                    PackageInfo pInfo = applicationContext.getPackageManager().getPackageInfo(getPackageName(), 0);
+                    appVersion = pInfo.versionName;
+                } catch (PackageManager.NameNotFoundException e) {
+                    e.printStackTrace();
+                }
+                if (appVersion == null) {
+                    appVersion = "";
+                }
+                request.addHeader("APP_VER",appVersion);
+                request.addHeader("PLATFORM","android-native");
+
                 Response response = chain.proceed(request.build());
 
-                switch (response.code()) {
-                    case 403:
-                        if (response.body() != null) {
-                            ErrorResponse errorResponse = TypeUtility.parseErrorResponse(response.body().charStream());
+                if (response.code() == 403) {
+                    if (response.body() != null) {
+                        ErrorResponse errorResponse = TypeUtility.parseErrorResponse(response.body().charStream());
 
-                            if (errorResponse != null) {
-                                if (errorResponse.getPayload().equals("SESSION_INVALID")) {
-                                    Queues.runOnUIThread(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            logout(true);
-                                            Toast.makeText(applicationContext, "دوباره وارد شوید", Toast.LENGTH_LONG).show();
-                                        }
-                                    });
-                                }
+                        if (errorResponse != null) {
+                            if (errorResponse.getPayload().equals("SESSION_INVALID")) {
+                                Queues.runOnUIThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        logout(true);
+                                        Toast.makeText(applicationContext, "دوباره وارد شوید", Toast.LENGTH_LONG).show();
+                                    }
+                                });
                             }
                         }
-                        throw new IOException("Unauthorized !!");
+                    }
+                    throw new IOException("Unauthorized !!");
                 }
 
                 return response;

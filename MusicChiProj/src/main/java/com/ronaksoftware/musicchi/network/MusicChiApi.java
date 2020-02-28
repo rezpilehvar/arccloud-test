@@ -6,6 +6,7 @@ import com.ronaksoftware.musicchi.network.request.RegisterRequest;
 import com.ronaksoftware.musicchi.network.request.SendCodeRequest;
 import com.ronaksoftware.musicchi.network.response.AuthorizationResponse;
 import com.ronaksoftware.musicchi.network.response.BooleanResponse;
+import com.ronaksoftware.musicchi.network.response.ConfigResponse;
 import com.ronaksoftware.musicchi.network.response.SendCodeResponse;
 import com.ronaksoftware.musicchi.network.response.SearchSongsListResponse;
 import com.ronaksoftware.musicchi.network.response.SoundSearchResponse;
@@ -38,4 +39,7 @@ public interface MusicChiApi {
 
     @GET("/music/search")
     Observable<ResponseEnvelope<SearchSongsListResponse>> search();
+
+    @GET("/help/config")
+    Observable<ResponseEnvelope<ConfigResponse>> getHelpConfigs();
 }

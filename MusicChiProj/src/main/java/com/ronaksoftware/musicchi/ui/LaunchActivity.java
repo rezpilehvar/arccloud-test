@@ -15,11 +15,15 @@ import android.view.Window;
 
 import androidx.annotation.NonNull;
 
+import com.ronaksoftware.musicchi.ApplicationLoader;
 import com.ronaksoftware.musicchi.R;
 import com.ronaksoftware.musicchi.UserConfigs;
 import com.ronaksoftware.musicchi.controllers.EventController;
+import com.ronaksoftware.musicchi.network.ResponseEnvelope;
+import com.ronaksoftware.musicchi.network.response.ConfigResponse;
 import com.ronaksoftware.musicchi.ui.fragments.HomeViewController;
 import com.ronaksoftware.musicchi.ui.fragments.RecognizeResultViewController;
+import com.ronaksoftware.musicchi.ui.fragments.UpdateViewController;
 import com.ronaksoftware.musicchi.ui.fragments.login.EnterPhoneViewController;
 import com.ronaksoftware.musicchi.ui.presenter.BaseViewController;
 import com.ronaksoftware.musicchi.ui.presenter.DrawerLayoutContainer;
@@ -32,6 +36,7 @@ import java.util.ArrayList;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
 
 public class LaunchActivity extends Activity implements PresenterLayout.Delegate {
 
@@ -83,7 +88,7 @@ public class LaunchActivity extends Activity implements PresenterLayout.Delegate
         presenterLayout.setDelegate(this);
 
         checkAuth();
-
+        checkUpdate();
         checkSystemBarColors();
 
         disposables.add(EventController.authChanged.observeOn(AndroidSchedulers.mainThread()).subscribeOn(AndroidSchedulers.mainThread()).subscribe(new Consumer<Object>() {
@@ -91,13 +96,41 @@ public class LaunchActivity extends Activity implements PresenterLayout.Delegate
             public void accept(Object o) throws Exception {
                 presenterLayout.removeAllFragments();
                 checkAuth();
+                checkUpdate();
             }
         }));
     }
 
+    private void checkUpdate() {
+        if (UserConfigs.isAuthenticated()) {
+            disposables.add(ApplicationLoader.musicChiApi.getHelpConfigs().subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Consumer<ResponseEnvelope<ConfigResponse>>() {
+                @Override
+                public void accept(ResponseEnvelope<ConfigResponse> configResponseResponseEnvelope) throws Exception {
+                    UserConfigs.showBilipLink = configResponseResponseEnvelope.getPayload().isShowBlipLink();
+                    UserConfigs.vasEnabled = configResponseResponseEnvelope.getPayload().isVasEnabled();
+                    UserConfigs.storeLink = configResponseResponseEnvelope.getPayload().getStoreLink();
+                    UserConfigs.save();
+
+                    if (configResponseResponseEnvelope.getPayload().isUpdateAvailable()) {
+                        showUpdateAlert(configResponseResponseEnvelope.getPayload().isUpdateForce());
+                    }
+                }
+            }));
+        }
+    }
+
+    private void showUpdateAlert(boolean force) {
+        if (force) {
+            presenterLayout.removeAllFragments();
+            presenterLayout.addFragmentToStack(new UpdateViewController(true));
+            presenterLayout.showLastFragment();
+        } else {
+            presenterLayout.presentFragment(new UpdateViewController(false));
+        }
+    }
+
     private void checkAuth() {
         if (UserConfigs.isAuthenticated()) {
-//            presenterLayout.addFragmentToStack(new HomeViewController());
             presenterLayout.addFragmentToStack(new HomeViewController());
         } else {
             presenterLayout.addFragmentToStack(new EnterPhoneViewController());
