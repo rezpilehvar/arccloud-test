@@ -24,6 +24,7 @@ import com.ronaksoftware.musicchi.ui.components.CircleImageView;
 import com.ronaksoftware.musicchi.ui.components.CircleProgressBar;
 import com.ronaksoftware.musicchi.ui.presenter.Theme;
 import com.ronaksoftware.musicchi.utils.Assets;
+import com.ronaksoftware.musicchi.utils.Browser;
 import com.ronaksoftware.musicchi.utils.DisplayUtility;
 import com.ronaksoftware.musicchi.utils.LayoutHelper;
 
@@ -88,10 +89,10 @@ public class SongCell extends FrameLayout {
             bilipLogoImageView.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    // handle intent todo
+                    Browser.openUrl(getContext(), "https://blip.fun/@" + currentSongObject.getId());
                 }
             });
-            addView(bilipLogoImageView,LayoutHelper.createFrame(28,28,Gravity.CENTER_VERTICAL | Gravity.RIGHT , 0,0,8,0));
+            addView(bilipLogoImageView, LayoutHelper.createFrame(28, 28, Gravity.CENTER_VERTICAL | Gravity.RIGHT, 0, 0, 8, 0));
         }
 
     }
@@ -122,7 +123,7 @@ public class SongCell extends FrameLayout {
         }
     }
 
-    public void updateProgress(float progress){
+    public void updateProgress(float progress) {
         progressBar.setProgress(progress);
     }
 
