@@ -11,7 +11,7 @@
     <string name="AccDescrMoreOptions">More options</string>
 
     <!--Login-->
-    <string name="auth_enter_phone_topText">برای عضویت در اپلیکیشن موزیکچی و یافتن مشخصات موسیقی در حال پخش شماره همراه خود\n را وارد نمایید</string>
+    <string name="auth_enter_phone_topText">برای عضویت در اپلیکیشن موزیکچی و یافتن مشخصات موسیقی در حال پخش شماره همراه خود را وارد نمایید</string>
     <string name="auth_enter_phone_centerText">عضویت در اپلیکیشن موزیکچی با تعرفه روزانه \n ششصد تومان</string>
 
     <string name="auth_enter_code_topText">کد چهار رقمی که برای شما پیامک شده را در باکس زیر وارد کرده و سپس تایید نمایید</string>

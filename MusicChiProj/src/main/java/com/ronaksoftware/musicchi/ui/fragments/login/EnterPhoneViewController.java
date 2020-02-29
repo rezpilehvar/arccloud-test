@@ -254,6 +254,9 @@ public class EnterPhoneViewController extends BaseViewController {
         }
 
         if (!phoneNumber.startsWith("2374")) {
+            if (phoneNumber.startsWith("0")) {
+                phoneNumber = phoneNumber.substring(1);
+            }
             if (!phoneNumber.startsWith("+98") && !phoneNumber.startsWith("98") && !phoneNumber.startsWith("+")) {
                 phoneNumber = "98" + phoneNumber;
             }
