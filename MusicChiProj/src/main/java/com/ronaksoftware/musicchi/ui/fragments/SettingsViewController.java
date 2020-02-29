@@ -16,6 +16,7 @@ import android.widget.Toast;
 import com.ronaksoftware.musicchi.ApplicationLoader;
 import com.ronaksoftware.musicchi.R;
 import com.ronaksoftware.musicchi.network.ResponseEnvelope;
+import com.ronaksoftware.musicchi.network.request.FeedbackRequest;
 import com.ronaksoftware.musicchi.network.request.LogoutRequest;
 import com.ronaksoftware.musicchi.network.response.BooleanResponse;
 import com.ronaksoftware.musicchi.ui.cells.SettingsCell;
@@ -27,6 +28,7 @@ import com.ronaksoftware.musicchi.ui.presenter.Theme;
 import com.ronaksoftware.musicchi.utils.AlertUtility;
 import com.ronaksoftware.musicchi.utils.DisplayUtility;
 import com.ronaksoftware.musicchi.utils.LayoutHelper;
+import com.ronaksoftware.musicchi.utils.Queues;
 import com.ronaksoftware.musicchi.utils.TypefaceUtility;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -100,10 +102,33 @@ public class SettingsViewController extends BaseViewController {
                         AlertUtility.createFeedBackAlert(SettingsViewController.this, new AlertUtility.FeedBackAlertDelegate() {
                             @Override
                             public void onSendPressed(String text) {
-
+                                showLoading();
+                                disposables.add(ApplicationLoader.musicChiApi.sendFeedback(new FeedbackRequest(text, 5)).observeOn(AndroidSchedulers.mainThread()).subscribeOn(Schedulers.io()).subscribe(new Consumer<ResponseEnvelope<BooleanResponse>>() {
+                                    @Override
+                                    public void accept(ResponseEnvelope<BooleanResponse> booleanResponseResponseEnvelope) throws Exception {
+                                        Queues.runOnUIThread(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                hideLoading();
+                                                Toast.makeText(getParentActivity(), "بازخورد شما با موفقیت ارسال شد.", Toast.LENGTH_LONG).show();
+                                            }
+                                        }, 1000);
+                                    }
+                                }, new Consumer<Throwable>() {
+                                    @Override
+                                    public void accept(Throwable throwable) throws Exception {
+                                        Queues.runOnUIThread(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                hideLoading();
+                                                Toast.makeText(getParentActivity(), "خطایی در ارسال بازخورد پیش آمده است.", Toast.LENGTH_LONG).show();
+                                            }
+                                        }, 1000);
+                                    }
+                                }));
                             }
                         });
-                    }else if (position == 1) {
+                    } else if (position == 1) {
 
                         AlertUtility.createLogoutAlert(SettingsViewController.this, new Runnable() {
                             @Override

@@ -1,5 +1,6 @@
 package com.ronaksoftware.musicchi.network;
 
+import com.ronaksoftware.musicchi.network.request.FeedbackRequest;
 import com.ronaksoftware.musicchi.network.request.LoginRequest;
 import com.ronaksoftware.musicchi.network.request.LogoutRequest;
 import com.ronaksoftware.musicchi.network.request.RegisterRequest;
@@ -42,4 +43,7 @@ public interface MusicChiApi {
 
     @GET("/help/config")
     Observable<ResponseEnvelope<ConfigResponse>> getHelpConfigs();
+
+    @POST("/help/feeback")
+    Observable<ResponseEnvelope<BooleanResponse>> sendFeedback(@Body FeedbackRequest feedbackRequest);
 }
